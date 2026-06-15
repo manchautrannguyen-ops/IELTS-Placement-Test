@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@600&display=swap" rel="stylesheet">
+    <title>IELTS Academic Reading — Test 1</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background-color: #ffffff; line-height: 1.4; font-size: 16px; }
+        .header { background-color: #ffffff; padding: 12px 20px; border-bottom: 1px solid #e0e0e0; display: flex; justify-content: space-between; align-items: center; position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: 60px; }
+        .test-info { display: flex; align-items: center; gap: 30px; font-size: 14px; color: #333; }
+        .header-icons { display: flex; gap: 10px; align-items: center; }
+        .main-container { margin-top: 60px; display: flex; flex-direction: column; background: #ffffff; height: calc(100vh - 60px); }
+        .panels-container { display: flex; flex: 1; overflow: hidden; }
+        .passage-panel { flex: 1; padding: 20px 20px 100px; overflow-y: auto; min-width: 200px; }
+        .reading-passage h4 { font-family: 'Merriweather', serif; font-size: 22px; font-weight: 600; color: #2c3e50; line-height: 1.4; margin-bottom: 8px; text-align: center; border-bottom: 2px solid #4a90e2; padding-bottom: 5px; }
+        .reading-passage .subtitle { text-align: center; font-style: italic; color: #555; margin-bottom: 20px; font-size: 16px; }
+        .reading-passage p { margin-bottom: 1.2em; text-align: justify; }
+        .questions-panel { flex: 1; padding: 20px 20px 100px; overflow-y: auto; min-width: 200px; border-left: 1px solid #e0e0e0; }
+        .resizer { width: 10px; cursor: col-resize; background-color: #f0f0f0; background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="30" viewBox="0 0 10 30"><path d="M4 11h2v2H4zM4 15h2v2H4zM4 19h2v2H4z" fill="%23888"/></svg>'); background-repeat: no-repeat; background-position: center; flex-shrink: 0; flex-grow: 0; }
+        .section-title { font-weight: bold; margin-bottom: 15px; font-size: 18px; }
+        .nav-arrows { position: fixed; bottom: 100px; right: 20px; display: flex; gap: 5px; z-index: 101; }
+        .nav-arrow { width: 50px; height: 50px; background: #333; color: white; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: bold; }
+        .nav-arrow:hover { background: #555; }
+        .nav-arrow:disabled { background: #ccc; cursor: not-allowed; }
+        .nav-row { position: fixed; bottom: 0; left: 0; right: 0; background: #ffffff; padding: 0; display: flex; align-items: center; height: 80px; z-index: 100; border-top: 1px solid #e0e0e0; }
+        .footer__questionWrapper___1tZ46 { display: flex; align-items: center; margin-right: 20px; }
+        .footer__questionNo___3WNct { background: none; border: none; padding: 10px 15px; font-size: 16px; font-weight: 600; color: #333; cursor: pointer; display: flex; align-items: center; gap: 5px; transition: background-color 0.2s; }
+        .footer__questionNo___3WNct:hover { background-color: #f8f9fa; }
+        .section-prefix { font-size: 16px; }
+        .sectionNr { font-size: 16px; font-weight: bold; }
+        .attemptedCount { font-size: 14px; color: #666; margin-left: 5px; font-weight: 400; }
+        @media (max-width: 768px) { .attemptedCount { display: none; } }
+        .footer__questionWrapper___1tZ46.selected .attemptedCount { display: none; }
+        .footer__subquestionWrapper___9GgoP { display: none; gap: 2px; margin-left: 10px; flex-wrap: wrap; }
+        .footer__questionWrapper___1tZ46.selected .footer__subquestionWrapper___9GgoP { display: flex; }
+        .subQuestion { width: 32px; height: 32px; border: 1px solid #ccc; background: white; color: #333; font-size: 14px; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; border-radius: 2px; }
+        .subQuestion.answered { background-color: #e9ecef; border-color: #ddd; }
+        .subQuestion.correct { background-color: #28a745; color: white; border-color: #28a745; }
+        .subQuestion.incorrect { background-color: #dc3545; color: white; border-color: #dc3545; }
+        .subQuestion:hover { background-color: #f0f0f0; border-color: #999; }
+        .subQuestion.active { background-color: #4a90e2; color: white; border-color: #4a90e2; }
+        .nav-separator { width: 1px; background: #e0e0e0; align-self: stretch; margin: 10px 0; }
+        .deliver-btn-wrapper { margin-left: auto; padding-right: 20px; }
+        #deliver-button { background: #333; color: white; border: none; padding: 10px 20px; font-size: 16px; font-weight: 600; cursor: pointer; border-radius: 4px; display: flex; align-items: center; gap: 8px; }
+        #deliver-button:hover { background: #555; }
+        #deliver-button:disabled { background: #aaa; cursor: not-allowed; }
+        .context-menu { position: fixed; background: white; border: 1px solid #ddd; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1000; display: none; min-width: 140px; }
+        .context-menu-item { padding: 12px 16px; cursor: pointer; font-size: 16px; border-bottom: 1px solid #f0f0f0; transition: background-color 0.2s; display: flex; align-items: center; gap: 8px; }
+        .context-menu-item:hover { background-color: #f8f9fa; }
+        .context-menu-item:last-child { border-bottom: none; }
+        .highlight { background-color: #ffff00; }
+        .comment-highlight { background-color: #90EE90; position: relative; cursor: help; }
+        .comment-tooltip { position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 8px 12px; border-radius: 4px; font-size: 14px; white-space: nowrap; z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+        .comment-highlight:hover .comment-tooltip { opacity: 1; }
+        .question { margin-bottom: 40px; }
+        .question p { margin-bottom: 10px; }
+        .question-prompt { margin-bottom: 20px; }
+        .question ul { list-style: none; padding-left: 0; }
+        .question ul li { margin-bottom: 5px; }
+        .answer-input { border: 1px solid #888; border-radius: 4px; background-color: #fff; padding: 2px 5px; font-size: 16px; text-align: center; margin-right: 4px; margin-left: 4px; transition: border-color 0.3s, box-shadow 0.3s; height: 28px; }
+        input[type="text"].answer-input { width: 160px; text-align: left; padding: 2px 8px; }
+        .answer-input.active-input { border-color: #4a90e2; box-shadow: 0 0 3px 1px rgba(74,144,226,0.5); }
+        .answer-input.correct { border-color: #28a745; background-color: #e9f7ef; }
+        .answer-input.incorrect { border-color: #dc3545; background-color: #f8d7da; color: #721c24; }
+        .questions-container { width: 100%; }
+        .part-header { background-color: #f1f2ec; padding: 15px 20px; border: 1px solid #e0e0e0; text-align: left; margin: 10px 20px; border-radius: 5px; }
+        .part-header p { margin: 0; }
+        .part-header p:first-child { margin-bottom: 5px; }
+        .timer-container { display: flex; position: relative; cursor: default; color: #333; font-size: 16px; font-weight: 500; align-items: center; }
+        .timer-controls { display: flex; align-items: center; gap: 8px; margin-left: 15px; }
+        .timer-controls button { background: #f0f0f0; border: 1px solid #ccc; border-radius: 50%; padding: 0; cursor: pointer; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; transition: background-color 0.2s; }
+        .timer-controls button:hover { background: #e0e0e0; }
+        .timer-controls button svg { width: 20px; height: 20px; fill: #333; }
+        .hidden { display: none !important; }
+        .tf-question { margin-bottom: 25px; padding: 10px 0px; border-radius: 4px; transition: border-color 0.3s, background-color 0.3s; }
+        .tf-question-line { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
+        .tf-question-number { font-weight: bold; min-width: 25px; color: #4a90e2; }
+        .tf-question-text { flex: 1; }
+        .tf-options { display: flex; gap: 15px; flex-wrap: wrap; margin-left: 35px; }
+        .tf-option { display: flex; align-items: center; gap: 5px; cursor: pointer; font-size: 15px; }
+        .tf-option input { accent-color: #4a90e2; transform: scale(1.2); }
+        .tf-question.correct { background-color: #e9f7ef; border-left: 4px solid #28a745; padding-left: 6px; }
+        .tf-question.incorrect { background-color: #f8d7da; border-left: 4px solid #dc3545; padding-left: 6px; }
+        .multi-choice-question { margin-bottom: 20px; padding: 10px; border-radius: 4px; border: 3px solid transparent; transition: border-color 0.3s, background-color 0.3s; }
+        .multi-choice-option { margin-bottom: 10px; padding: 8px; border-radius: 4px; transition: background-color 0.3s; }
+        .multi-choice-option label { display: flex; align-items: center; cursor: pointer; font-size: 16px; }
+        .multi-choice-option input[type="radio"] { margin-right: 12px; transform: scale(1.3); accent-color: #4a90e2; }
+        .multi-choice-option.correct { background-color: #e9f7ef; }
+        .multi-choice-option.incorrect { background-color: #f8d7da; }
+        .multi-choice-question.correct { border-color: #28a745; }
+        .multi-choice-question.incorrect { border-color: #dc3545; }
+        .matching-form-container { display: flex; flex-direction: column; gap: 10px; }
+        .matching-form-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #f0f0f0; }
+        .matching-form-label { flex: 1; font-size: 15px; }
+        .matching-form-row.correct { background-color: #e9f7ef; padding: 8px; border-radius: 4px; }
+        .matching-form-row.incorrect { background-color: #f8d7da; padding: 8px; border-radius: 4px; }
+        .matching-form-row select.answer-input { width: 80px; }
+        .correct-answer-display { color: #28a745; font-size: 14px; }
+        .correct-answer-highlight { font-weight: bold; color: #28a745; }
+        .options-box { background-color: #f9f9f9; border: 1px solid #ddd; padding: 12px 16px; border-radius: 5px; margin: 12px 0 20px; }
+        .options-box p { margin: 4px 0; font-size: 15px; }
+        .headings-box { background-color: #eef4fb; border: 1px solid #cfe0f5; padding: 12px 16px; border-radius: 5px; margin: 12px 0 20px; }
+        .headings-box .hb-title { font-weight: bold; margin-bottom: 8px; }
+        .headings-box p { margin: 4px 0; font-size: 15px; display: flex; gap: 8px; }
+        .headings-box .rn { font-weight: bold; min-width: 28px; color: #4a90e2; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; display: flex; justify-content: center; align-items: center; }
+        .modal-content { background: white; border-radius: 8px; padding: 30px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; position: relative; }
+        .modal-close-btn { position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 24px; cursor: pointer; color: #333; }
+        .results-summary { font-size: 18px; margin-bottom: 20px; }
+        .results-summary p { margin-bottom: 8px; }
+        .results-details-container { display: flex; flex-direction: column; gap: 8px; }
+        .result-item { display: flex; justify-content: space-between; padding: 8px 12px; border-radius: 4px; font-size: 15px; }
+        .result-item.correct { background: #e9f7ef; }
+        .result-item.incorrect { background: #f8d7da; }
+        #goto-widget { display: flex; align-items: center; gap: 5px; }
+        #goto-input { width: 80px; padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px; }
+        #goto-btn { padding: 4px 10px; border: 1px solid #ccc; background-color: #f0f0f0; border-radius: 4px; cursor: pointer; }
+        .question-set { display: block; }
+        .question-set.hidden { display: none !important; }
+
+        /* === Student-info gate (shown before the test starts) === */
+        .gate-overlay {
+            position: fixed; inset: 0;
+            background: rgba(20,30,45,0.55);
+            backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 200; padding: 20px;
+        }
+        .gate-card {
+            background: #ffffff; border: 1px solid #e0e0e0;
+            border-radius: 6px; padding: 32px 32px 28px;
+            max-width: 440px; width: 100%;
+            box-shadow: 0 24px 60px rgba(0,0,0,0.22);
+            font-family: Arial, sans-serif;
+        }
+        .gate-card .gate-eyebrow {
+            font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase;
+            color: #4a90e2; margin: 0 0 8px; font-weight: 700;
+        }
+        .gate-card h2 {
+            font-family: 'Merriweather', serif; font-weight: 600;
+            font-size: 24px; margin: 0 0 8px; color: #2c3e50;
+        }
+        .gate-card .gate-sub { font-size: 14px; color: #555; margin: 0 0 22px; }
+        .gate-field { margin-bottom: 14px; }
+        .gate-field label {
+            display: block; font-size: 12px; letter-spacing: 0.05em;
+            text-transform: uppercase; color: #555; margin-bottom: 6px; font-weight: 600;
+        }
+        .gate-field label .req { color: #dc3545; margin-left: 2px; }
+        .gate-field input {
+            width: 100%; font: inherit; font-size: 15px; color: #333;
+            background: #fff; border: 1px solid #ccc; border-radius: 4px;
+            padding: 9px 12px; outline: none;
+            transition: border-color .15s, box-shadow .15s;
+        }
+        .gate-field input:focus {
+            border-color: #4a90e2; box-shadow: 0 0 0 3px rgba(74,144,226,0.18);
+        }
+        .gate-field input.invalid {
+            border-color: #dc3545; background: #fbeceb;
+        }
+        .gate-error {
+            font-size: 13px; color: #dc3545; margin: 0 0 12px; min-height: 18px;
+        }
+        .gate-actions { display: flex; justify-content: flex-end; margin-top: 6px; }
+        .gate-start-btn {
+            background: #333; color: #fff; border: none;
+            padding: 10px 20px; font-size: 15px; font-weight: 600;
+            cursor: pointer; border-radius: 4px;
+            transition: background .15s;
+        }
+        .gate-start-btn:hover { background: #555; }
+        /* Identity badge added to the header after the gate closes */
+        .student-tag {
+            font-size: 13px; color: #666; margin-left: 24px;
+            padding: 4px 10px; border: 1px solid #e0e0e0; border-radius: 4px;
+            background: #fafafa; white-space: nowrap;
+        }
+        .student-tag b { color: #333; font-weight: 600; }
+    </style>
+</head>
+<body>
+
+    <!-- Student-info gate: must enter Name + Class before starting the test -->
+    <div class="gate-overlay" id="gate-overlay" role="dialog" aria-modal="true" aria-labelledby="gate-title">
+        <div class="gate-card">
+            <p class="gate-eyebrow">Before you begin</p>
+            <h2 id="gate-title">Student information</h2>
+            <p class="gate-sub">Please enter your name and class. The 60-minute timer will start once you begin.</p>
+            <div class="gate-field">
+                <label for="gate-name">Name<span class="req">*</span></label>
+                <input type="text" id="gate-name" autocomplete="name" spellcheck="false" />
+            </div>
+            <div class="gate-field">
+                <label for="gate-class">Class<span class="req">*</span></label>
+                <input type="text" id="gate-class" autocomplete="off" spellcheck="false" />
+            </div>
+            <p class="gate-error" id="gate-error"></p>
+            <div class="gate-actions">
+                <button class="gate-start-btn" id="gate-start" type="button">Start practice</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <div class="header">
+        <div class="test-info">
+            <span><strong>IELTS Academic Reading</strong></span>
+            <div class="timer-container">
+                <span>⏱</span>&nbsp;<span class="timer-display">60:00</span>
+                <div class="timer-controls">
+                    <button id="timer-toggle-btn" title="Pause/Resume">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                    </button>
+                    <button id="timer-reset-btn" title="Reset Timer">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="header-icons">
+            <div id="goto-widget">
+                <label for="goto-input" style="font-size:14px;">Go to Q:</label>
+                <input type="number" id="goto-input" min="1" max="40" placeholder="1-40">
+                <button id="goto-btn">Go</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Part Headers -->
+    <div class="main-container" id="main-container">
+        <div id="passage-header-container">
+            <div id="part-header-1" class="part-header">
+                <p><strong>Part 1</strong></p>
+                <p>You should spend about 20 minutes on Questions 1–13.</p>
+            </div>
+            <div id="part-header-2" class="part-header hidden">
+                <p><strong>Part 2</strong></p>
+                <p>You should spend about 20 minutes on Questions 14–26.</p>
+            </div>
+            <div id="part-header-3" class="part-header hidden">
+                <p><strong>Part 3</strong></p>
+                <p>You should spend about 20 minutes on Questions 27–40.</p>
+            </div>
+        </div>
+
+        <div class="panels-container">
+            <!-- PASSAGE PANEL -->
+            <div class="passage-panel" id="passage-panel">
+
+                <!-- PASSAGE 1: Fishbourne Roman Palace -->
+                <div id="passage-text-1" class="reading-passage">
+                    <h4>Fishbourne Roman Palace</h4>
+                    <p class="subtitle">The largest Roman villa in Britain</p>
+                    <p>Fishbourne Roman Palace is in the village of Fishbourne in West Sussex, England. This large palace was built in the 1st century AD, around thirty years after the Roman conquest of Britain, on the site of Roman army grain stores which had been established after the invasion, in the reign of the Roman Emperor Claudius in 43 AD. The rectangular palace was built around formal gardens, the northern half of which have been reconstructed. There were extensive alterations in the 2nd and 3rd centuries AD, with many of the original black and white mosaic floors being overlaid with more sophisticated coloured ones, including a perfectly preserved mosaic of a dolphin in the north wing. More alterations were in progress when the palace burnt down in around 270AD, after which it was abandoned.</p>
+                    <p>Local people had long believed that a Roman palace once existed in the area. However, it was not until 1960 that the archaeologist Barry Cunliffe, of Oxford University, first systematically excavated the site, after workmen had accidentally uncovered a wall while they were laying a water main. The Roman villa excavated by Cunliffe's team was so grand that it became known as Fishbourne Roman Palace, and a museum was erected to preserve some of the remains. This is administered by the Sussex Archaeological Society.</p>
+                    <p>In its day, the completed palace would have comprised four large wings with colonnaded fronts. The north and east wings consisted of suites of private rooms built around courtyards, with a monumental entrance in the middle of the east wing. In the north-east corner there was an assembly hall. The west wing contained state rooms, a large ceremonial reception room, and a gallery. The south wing contained the owner's private apartments. The palace included as many as 50 mosaic floors, under-floor central heating and a bathhouse. In size, Fishbourne Palace would have been approximately equivalent to some of the great Roman palaces of Italy, and was by far the largest known Roman residence north of the European Alps, at about 500 feet (150m) square. A team of volunteers and professional archaeologists are involved in an ongoing archaeological excavation on the site of nearby, possibly military, buildings.</p>
+                    <p>The first buildings to be erected on the site were constructed in the early part of the conquest in 43 AD. Later, two timber buildings were constructed, one with clay and mortar floors and plaster walls, which appears to have been a house of some comfort. These buildings were demolished in the 60s AD and replaced by a substantial stone house, which included colonnades, and a bath suite. It has been suggested that the palaces itself, incorporating the previous house in its south-east corner, was constructed around 73-75 AD. However, Dr Miles Russell, of Bournemouth University, reinterpreted the ground plan and the collection of objects found and has suggested that, given the extremely close parallels with the imperial palace of Domitian in Rome, its construction may more plausibly date to after 92 AD.</p>
+                    <p>With regard to who lived in Fishbourne Palace, there are a number of theories; for example, one proposed by Professor Cunliffe is that, in its early phase, the palace was the residence of Tiberius Claudius Cogidubnus, a local chieftain who supported the Romans, and who may have been installed as king of a number of territories following the first stage of the conquest. Cogidubnus is known from a reference to his loyalty in Agricola, a work by the Roman writer Tacitus, and from an inscription commemorating a temple dedicated to the gods Neptune and Minerva found in the nearby city of Chichester. Another theory is that it was built for Sallustius Lucullus, a Roman governor of Britain of the late 1st century, who may have been the son of the British prince Adminius. Two inscriptions recording the presence of Lucullus have been found in Chichester, and the redating by Miles Russell of the palace was designed for Lucullus, then it may have only been in use for a few years, as the Roman historian Suetonius records that Lucullus was executed by the Emperor Domitian in or shortly after 93 AD.</p>
+                    <p>Additional theories suggest that either Verica, a British king of the Roman Empire in the years preceding the Claudian invasion, was owner of the palace, or Tiberius Claudius Catuarus, following the recent discovery of a gold ring belonging to him. The palace outlasted the original owner, whoever he was, and was extensively re-planned early in the 2nd century AD, and subdivided into a series of lesser apartments. Further redevelopment was begun in the late 3rd century AD, but these alterations were incomplete when the north wing was destroyed in a fire in around 270 AD. The damage was too great repair, and the palace was abandoned and later dismantled.</p>
+                    <p>A modern museum had been built by the Sussex Archaeological Society, incorporating most of the visible remains, including one wing of the palace. The gardens have been re-planted using authentic plants from the Roman period.</p>
+                </div>
+
+                <!-- PASSAGE 2: Insect decision-making -->
+                <div id="passage-text-2" class="reading-passage hidden">
+                    <h4>Insect decision-making</h4>
+                    <p><strong>A</strong>&nbsp;&nbsp;It has long been held that decision made collectively by large groups of people are more likely to turn out to be accurate than decisions made by individuals. The idea goes back to the 'jury theorem' of Nicolas de Condorcet, an 18th-century French philosopher who was one of the first to apply mathematics to the social sciences. Condorcet's theory describes collective decisions, outlining how democratic decisions tend to outperform dictatorial ones. If, for example, each member of a jury has only partial information, the majority decision is more likely to be correct than a decision arrived at by a single juror. Moreover, the probability of a correct decision increases with the size of the jury.</p>
+                    <p><strong>B</strong>&nbsp;&nbsp;Now it is becoming clear that group decisions are also extremely valuable for the success of social animals, such as ants, bees, birds and dolphins. Bees make collective decisions, and they do it rather well, according to Christian List of the London School of Economics, who has studied group decision-making in humans and animals. Researchers led by Dr List looked at colonies once the original colony reaches a certain size. The queen goes off with about two-thirds of the worker bees to live in a new home or nest, leaving a daughter queen in the old nest with the remaining workers. Among the bees that depart are some that have searched for and found some new nest sites, and reported back using a characteristic body movement known as a 'waggle dance' to indicate to the other bees the suitable places they have located. The longer the dance, the better the site. After a while, other bees start to visit the sites signaled by their companions to see for themselves and, on their return, also perform more waggle dances. The process eventually leads to a consensus on the best site and the breakaway swarm migrates. The decision is remarkably reliable, with the bees choosing the best site even when there are only small difference between alternative sites.</p>
+                    <p><strong>C</strong>&nbsp;&nbsp;But exactly how do bees reach such a robust consensus? To find out, Dr List and his colleagues used a computer generated model of the decision-making process. By experimenting with it they found that, when bees in the model were very good at finding nesting sites but did not share their information, this dramatically slowed down the migration, leaving the swarm homeless and vulnerable. Conversely, bees in the model blindly following the waggle dances of others without first checking. The researchers concluded that the ability of bees to identify successfully and quickly the best site depends on both the bees' interdependence in communicating the whereabouts of the bees site, and their independence in confirming this information for themselves.</p>
+                    <p><strong>D</strong>&nbsp;&nbsp;Another situation in which collective decisions are taken occurs when animals are either isolated from crucial sources of information or dominated by other members of the group. José Halloy of the Free University of Brussels in Belgium used robotic cockroaches to subvert the behaviour of living cockroaches and control their decision-making process. In his experiment, the artificial bugs were introduced to the live ones and soon became sufficiently socially integrated that they were perceived by the real cockroaches as equals. By manipulating the robots, which were in the minority, Halloy was able to persuade the living cockroaches to choose an inappropriate shelter–even one which they had rejected before being infiltrated by the robots.</p>
+                    <p><strong>E</strong>&nbsp;&nbsp;The way insects put into effect collective decisions can be complex and as important as the decisions themselves. At the University of Bristol, in the UK, Nigel Franks and his associates studied how a species of ant establishes a new nest. Franks and his associates reported how the insects reduce the problems associated with making a necessarily swift choice. If the ants' existing nest become suddenly threatened, the insects choose certain ants to act as scouts to find a new nest. How quickly they accomplish the transfer to a new home depends not only on how soon the best available site is found, but also on how quickly the migration there can be achieved.</p>
+                    <p><strong>F</strong>&nbsp;&nbsp;Once the suitable new nest is identified, the chosen ants begin to lead others, which have made it to the new site or which may simply be in the vicinity, back to the original threatened nest. In this way, those ants which are familiar with the route can help transport, for example, the queen and young ants to the new site, and simultaneously show the way to those ants which have been left behind to guard the old nest. In this way moving processes are accomplished faster and more efficiently. Thus the dynamics of collective decision-making are closely related to the efficient implementation of those decisions. How this might apply to choices that humans make is, as yet, unclear. But it does suggest, even for humans, the importance of recruiting dynamic leaders to a cause, because the most important thing about collective decision-making, as shown by these insect experiments, is to get others to follow.</p>
+                </div>
+
+                <!-- PASSAGE 3: Fear of the Unknown -->
+                <div id="passage-text-3" class="reading-passage hidden">
+                    <h4>Fear of the Unknown</h4>
+                    <p class="subtitle">American companies fear that innovation is the secret of success–and that they cannot innovate</p>
+                    <p><strong>A</strong>&nbsp;&nbsp;In the small Umagic office in midtown Manhattan, a team of 30 computer programmers are working on setting up websites that will allow subscribers to feed in details about themselves and their problems and to receive advice from 'virtual' versions of personalities regarded as experts in their fields: for example, a well-known dietician, a celebrity fitness trainer, a psychologist well known in the media for their work on parent-child relationships. Umagic Systems is a young firm and it's hard to predict how far they'll go. In ten years' time, consulting a computer about your diet problems might seem natural or it might seem absurd. But the company and others like it are beginning to seriously worry large American firms, who see such half-crazy new and innovative ideas as a threat to their own future success.</p>
+                    <p><strong>B</strong>&nbsp;&nbsp;Innovation has become a major concern of American management. Firms have found that it is increasingly difficult to redesign existing products or to produce them more economically. The stars of American business tend today to be innovators such as Amazon (the internet bookstore) and Wal-Mart (the supermarket chain) which have produced completely new ideas or products that have changed their industries.</p>
+                    <p><strong>C</strong>&nbsp;&nbsp;Over the past 15 years, the firms which have achieved the greatest profits have been the ones which have had the most innovations. But such profits aren't easy to come by. One of the reasons for the increasing number of mergers between companies is a desperate search for new ideas. And a fortune is spent nowadays on identifying and protecting intellectual property: other people's ideas. According to the Pasadena-based Patent &amp; License Exchange in the United States, trading in intangible assets such as intellectual property rose from $15 billion in 1990 to $100 billion in 1998, with an increasing proportion of the rewards going to small firms and individuals.</p>
+                    <p><strong>D</strong>&nbsp;&nbsp;And therein lies the terror for big companies: that innovation seems to work best outside them. Many of the large established companies have been struggling to come up with new products recently.' In the management of creativity, size is your enemy,' argues Peter Chemin, who runs Fox TV and film empire for News Corporation. 'One person managing 20 movies is never going to be as involved as one doing five movies.' He has thus tried to break down the studio into smaller units, even at the risk of incurring higher costs.</p>
+                    <p><strong>E</strong>&nbsp;&nbsp;It is easier for ideas to develop outside big firms these days. In the past, if a clever scientist had an idea he wanted to commercialise, he would take it first to a big company. Now, with the banks encouraging individuals to set up new businesses through offering special loans, innovators are more likely to set up on their own. Umagic has already raised $5 million and is about to raise $25 million more. Even in capital-intensive businesses such as pharmaceuticals, entrepreneurs can conduct profitable, early-stage research, selling out to the big firms when they reach expensive, risky clinical trials.</p>
+                    <p><strong>F</strong>&nbsp;&nbsp;Some giants, including General Electric and Cisco, have been remarkably successful at buying up and integrating scores of small companies. But many others worry about the prices they have to pay and the difficulty in keeping hold of the people who dreamt up the ideas. Everybody would like to develop more ideas in-house. Procter &amp; Gamble is now changing the entire direction of its business from global expansion to product development; one of its new aims is to get innovations accepted across the company. Elsewhere, the search for innovation had led to a craze for 'intrapreneurship' – giving more power to individuals in the company and setting up internal ideas-factories so that talents staff will not leave.</p>
+                    <p><strong>G</strong>&nbsp;&nbsp;And yet innovation does not happen just because the chief executive wills it. Indeed, it is extremely difficult to come up with new ideas year in, year out, especially brilliant ones. Underneath all experts' diagrams, lists and charts, most of the available answers seem to focus on two strengths that are difficult to impose: a culture that looks for new ideas, and leaders who know which ones to back. Companies have to discredit the widespread view that jobs working on new products are for 'those who can't cope in the real business'. They have to change the culture by introducing hard incentives, such as giving more generous bonuses to those who come up with successful new ideas and, particularly, not punishing those whose experiments fail.</p>
+                    <p><strong>H</strong>&nbsp;&nbsp;Will all this reorganization and culture tweaking make big firms more creative? David Post, the founder of Umagic, isn't so sure. He also recalls with glee the looks of total incomprehension when he tried to sell his 'virtual experts' idea three years ago to firms such IBM, though, as he cheerfully adds, 'of course, they could have been right'. Apparently, innovation–unlike diet, fitness and parenting–is one area where a computer cannot tell you what to do.</p>
+                </div>
+            </div>
+
+            <div class="resizer" id="resizer"></div>
+
+            <!-- QUESTIONS PANEL -->
+            <div class="questions-panel" id="questions-panel">
+
+                <!-- QUESTIONS 1-13 (Passage 1) -->
+                <div id="questions-1" class="question-set">
+                    <div class="questions-container">
+
+                        <!-- Q1-6: TRUE/FALSE/NOT GIVEN -->
+                        <div class="question" data-q-start="1" data-q-end="6">
+                            <div class="question-prompt">
+                                <p><strong>Questions 1–6</strong><br>Do the following statements agree with the information given in Reading Passage 1?</p>
+                                <p>In boxes 1–6 on your answer sheet, write:</p>
+                                <ul style="list-style:none;padding-left:0;">
+                                    <li><strong>TRUE</strong> if the statement agrees with the information</li>
+                                    <li><strong>FALSE</strong> if the statement contradicts the information</li>
+                                    <li><strong>NOT GIVEN</strong> if there is no information on this</li>
+                                </ul>
+                            </div>
+                            <div class="tf-question" data-q-start="1" data-q-end="1">
+                                <div class="tf-question-line"><span class="tf-question-number">1</span><span class="tf-question-text">Fishbourne Palace was the first structure to be built on its site.</span></div>
+                                <div class="tf-options"><label class="tf-option"><input type="radio" name="q1" value="TRUE"> TRUE</label><label class="tf-option"><input type="radio" name="q1" value="FALSE"> FALSE</label><label class="tf-option"><input type="radio" name="q1" value="NOT GIVEN"> NOT GIVEN</label></div>
+                            </div>
+                            <div class="tf-question" data-q-start="2" data-q-end="2">
+                                <div class="tf-question-line"><span class="tf-question-number">2</span><span class="tf-question-text">Fishbourne Palace was renovated more than once.</span></div>
+                                <div class="tf-options"><label class="tf-option"><input type="radio" name="q2" value="TRUE"> TRUE</label><label class="tf-option"><input type="radio" name="q2" value="FALSE"> FALSE</label><label class="tf-option"><input type="radio" name="q2" value="NOT GIVEN"> NOT GIVEN</label></div>
+                            </div>
+                            <div class="tf-question" data-q-start="3" data-q-end="3">
+                                <div class="tf-question-line"><span class="tf-question-number">3</span><span class="tf-question-text">Fishbourne Palace was large in comparison with Roman palaces in Italy.</span></div>
+                                <div class="tf-options"><label class="tf-option"><input type="radio" name="q3" value="TRUE"> TRUE</label><label class="tf-option"><input type="radio" name="q3" value="FALSE"> FALSE</label><label class="tf-option"><input type="radio" name="q3" value="NOT GIVEN"> NOT GIVEN</label></div>
+                            </div>
+                            <div class="tf-question" data-q-start="4" data-q-end="4">
+                                <div class="tf-question-line"><span class="tf-question-number">4</span><span class="tf-question-text">Research is continuing in the area close to Fishbourne Palace.</span></div>
+                                <div class="tf-options"><label class="tf-option"><input type="radio" name="q4" value="TRUE"> TRUE</label><label class="tf-option"><input type="radio" name="q4" value="FALSE"> FALSE</label><label class="tf-option"><input type="radio" name="q4" value="NOT GIVEN"> NOT GIVEN</label></div>
+                            </div>
+                            <div class="tf-question" data-q-start="5" data-q-end="5">
+                                <div class="tf-question-line"><span class="tf-question-number">5</span><span class="tf-question-text">Researches agree on the identity of the person for whom Fishbourne Palace was constructed.</span></div>
+                                <div class="tf-options"><label class="tf-option"><input type="radio" name="q5" value="TRUE"> TRUE</label><label class="tf-option"><input type="radio" name="q5" value="FALSE"> FALSE</label><label class="tf-option"><input type="radio" name="q5" value="NOT GIVEN"> NOT GIVEN</label></div>
+                            </div>
+                            <div class="tf-question" data-q-start="6" data-q-end="6">
+                                <div class="tf-question-line"><span class="tf-question-number">6</span><span class="tf-question-text">Fishbourne Palace was burnt down by local people.</span></div>
+                                <div class="tf-options"><label class="tf-option"><input type="radio" name="q6" value="TRUE"> TRUE</label><label class="tf-option"><input type="radio" name="q6" value="FALSE"> FALSE</label><label class="tf-option"><input type="radio" name="q6" value="NOT GIVEN"> NOT GIVEN</label></div>
+                            </div>
+                        </div>
+
+                        <!-- Q7-13: Notes Completion -->
+                        <div class="question" data-q-start="7" data-q-end="13">
+                            <div class="question-prompt">
+                                <p><strong>Questions 7–13</strong><br>Complete the notes below.</p>
+                                <p>Choose <strong>NO MORE THAN TWO WORDS AND/OR A NUMBER</strong> from the passage for each answer.</p>
+                            </div>
+                            <div class="options-box" style="font-size:15px;">
+                                <p style="text-align:center;"><strong>Fishbourne Palace</strong></p>
+                                <p><strong>Construction</strong></p>
+                                <p>The first buildings on the site contained food for the <strong>7</strong> <input type="text" class="answer-input" id="q7" placeholder="7"></p>
+                                <p>The palace building surrounded <strong>8</strong> <input type="text" class="answer-input" id="q8" placeholder="8"></p>
+                                <p>In the 2nd and 3rd centuries colour was added to the <strong>9</strong> <input type="text" class="answer-input" id="q9" placeholder="9"> of the palace.</p>
+                                <p><strong>Discovery</strong></p>
+                                <p>The first part of the palace to be found was part of a <strong>10</strong> <input type="text" class="answer-input" id="q10" placeholder="10"></p>
+                                <p><strong>Possible inhabitants</strong></p>
+                                <p>Cogidubnus – he is named in several writings</p>
+                                <p>Sallustius Lucullus – he may have lived there until approximately <strong>11</strong> <input type="text" class="answer-input" id="q11" placeholder="11"> AD</p>
+                                <p>Verica – a British king</p>
+                                <p>Catuarus – his <strong>12</strong> <input type="text" class="answer-input" id="q12" placeholder="12"> was found there</p>
+                                <p><strong>Present Day</strong></p>
+                                <p>A <strong>13</strong> <input type="text" class="answer-input" id="q13" placeholder="13"> has been built on the site to help protect it.</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- QUESTIONS 14-26 (Passage 2) -->
+                <div id="questions-2" class="question-set hidden">
+                    <div class="questions-container">
+
+                        <!-- Q14-19: Headings Matching -->
+                        <div class="question" data-q-start="14" data-q-end="19">
+                            <div class="question-prompt">
+                                <p><strong>Questions 14–19</strong><br>Reading Passage 2 has six paragraphs, <strong>A–F</strong>.</p>
+                                <p>Choose the correct heading for each paragraph from the list of headings below.</p>
+                                <p>Write the correct number, <strong>i–vii</strong>, in boxes 14–19 on your answer sheet.</p>
+                            </div>
+                            <div class="headings-box">
+                                <div class="hb-title">List of Headings</div>
+                                <p><span class="rn">i</span><span>The effect of man-made imitations on insects</span></p>
+                                <p><span class="rn">ii</span><span>The need to instruct additional insect guides</span></p>
+                                <p><span class="rn">iii</span><span>Signals used by certain insects to indicate a discovery</span></p>
+                                <p><span class="rn">iv</span><span>How urgency can affect the process of finding a new home</span></p>
+                                <p><span class="rn">v</span><span>The use of trained insects in testing scientific theories</span></p>
+                                <p><span class="rn">vi</span><span>The use of virtual scenarios in the study of insect behaviour</span></p>
+                                <p><span class="rn">vii</span><span>How the number of decision-makers affects the decision</span></p>
+                            </div>
+                            <div class="matching-form-container">
+                                <div class="matching-form-row">
+                                    <label for="q14" class="matching-form-label"><strong>14</strong>&nbsp;&nbsp;Paragraph A</label>
+                                    <select class="answer-input" id="q14"><option value=""></option><option>i</option><option>ii</option><option>iii</option><option>iv</option><option>v</option><option>vi</option><option>vii</option></select>
+                                </div>
+                                <div class="matching-form-row">
+                                    <label for="q15" class="matching-form-label"><strong>15</strong>&nbsp;&nbsp;Paragraph B</label>
+                                    <select class="answer-input" id="q15"><option value=""></option><option>i</option><option>ii</option><option>iii</option><option>iv</option><option>v</option><option>vi</option><option>vii</option></select>
+                                </div>
+                                <div class="matching-form-row">
+                                    <label for="q16" class="matching-form-label"><strong>16</strong>&nbsp;&nbsp;Paragraph C</label>
+                                    <select class="answer-input" id="q16"><option value=""></option><option>i</option><option>ii</option><option>iii</option><option>iv</option><option>v</option><option>vi</option><option>vii</option></select>
+                                </div>
+                                <div class="matching-form-row">
+                                    <label for="q17" class="matching-form-label"><strong>17</strong>&nbsp;&nbsp;Paragraph D</label>
+                                    <select class="answer-input" id="q17"><option value=""></option><option>i</option><option>ii</option><option>iii</option><option>iv</option><option>v</option><option>vi</option><option>vii</option></select>
+                                </div>
+                                <div class="matching-form-row">
+                                    <label for="q18" class="matching-form-label"><strong>18</strong>&nbsp;&nbsp;Paragraph E</label>
+                                    <select class="answer-input" id="q18"><option value=""></option><option>i</option><option>ii</option><option>iii</option><option>iv</option><option>v</option><option>vi</option><option>vii</option></select>
+                                </div>
+                                <div class="matching-form-row">
+                                    <label for="q19" class="matching-form-label"><strong>19</strong>&nbsp;&nbsp;Paragraph F</label>
+                                    <select class="answer-input" id="q19"><option value=""></option><option>i</option><option>ii</option><option>iii</option><option>iv</option><option>v</option><option>vi</option><option>vii</option></select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Q20-23: Match findings with academics -->
+                        <div class="question" data-q-start="20" data-q-end="23">
+                            <div class="question-prompt">
+                                <p><strong>Questions 20–23</strong><br>Look at the following findings (Questions 20–23) and the list of academics below.</p>
+                                <p>Match each finding with the correct academic, <strong>A–D</strong>.</p>
+                                <p>Write the correct letter, <strong>A–D</strong>, in boxes 20–23 on your answer sheet.</p>
+                                <p><em><strong>NB</strong> You may use any letter more than once.</em></p>
+                            </div>
+                            <div class="options-box">
+                                <p><strong>A</strong>&nbsp;&nbsp;Nicolas de Condorcet</p>
+                                <p><strong>B</strong>&nbsp;&nbsp;Christian List and colleagues</p>
+                                <p><strong>C</strong>&nbsp;&nbsp;José Halloy</p>
+                                <p><strong>D</strong>&nbsp;&nbsp;Nigel Franks and colleagues</p>
+                            </div>
+                            <div class="matching-form-container">
+                                <div class="matching-form-row">
+                                    <label for="q20" class="matching-form-label"><strong>20</strong>&nbsp;&nbsp;Certain members can influence the rest of the group to alter a previous decision.</label>
+                                    <select class="answer-input" id="q20"><option value=""></option><option>A</option><option>B</option><option>C</option><option>D</option></select>
+                                </div>
+                                <div class="matching-form-row">
+                                    <label for="q21" class="matching-form-label"><strong>21</strong>&nbsp;&nbsp;Individual verification of a proposed choice is important for successful decision outcome.</label>
+                                    <select class="answer-input" id="q21"><option value=""></option><option>A</option><option>B</option><option>C</option><option>D</option></select>
+                                </div>
+                                <div class="matching-form-row">
+                                    <label for="q22" class="matching-form-label"><strong>22</strong>&nbsp;&nbsp;The more individuals taking part in a decision, the better the decision will be.</label>
+                                    <select class="answer-input" id="q22"><option value=""></option><option>A</option><option>B</option><option>C</option><option>D</option></select>
+                                </div>
+                                <div class="matching-form-row">
+                                    <label for="q23" class="matching-form-label"><strong>23</strong>&nbsp;&nbsp;The decision-making process of certain insects produces excellent results even when fine distinctions are required.</label>
+                                    <select class="answer-input" id="q23"><option value=""></option><option>A</option><option>B</option><option>C</option><option>D</option></select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Q24-26: Summary Completion -->
+                        <div class="question" data-q-start="24" data-q-end="26">
+                            <div class="question-prompt">
+                                <p><strong>Questions 24–26</strong><br>Complete the summary below.</p>
+                                <p>Choose <strong>ONE WORD ONLY</strong> from the passage for each answer.</p>
+                            </div>
+                            <div class="options-box" style="font-size:15px;">
+                                <p style="text-align:center;"><strong>A study of insect decision-making</strong></p>
+                                <p>A Bristol University study looked at how insects make decisions when their home has been <strong>24</strong> <input type="text" class="answer-input" id="q24" placeholder="24">. The ants in the experiment relied on the use of individuals called <strong>25</strong> <input type="text" class="answer-input" id="q25" placeholder="25"> to find a new nest and efficiently direct the others to go there. The study concluded that the effective implementation of the ants' decision meant that the insects could change homes quickly. The study emphasized the necessity, for people well as insects, of having active <strong>26</strong> <input type="text" class="answer-input" id="q26" placeholder="26"> in order to execute decisions successfully.</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- QUESTIONS 27-40 (Passage 3) -->
+                <div id="questions-3" class="question-set hidden">
+                    <div class="questions-container">
+
+                        <!-- Q27-33: Paragraph Matching -->
+                        <div class="question" data-q-start="27" data-q-end="33">
+                            <div class="question-prompt">
+                                <p><strong>Questions 27–33</strong><br>Reading Passage 3 has eight paragraphs, <strong>A–H</strong>.</p>
+                                <p>Which paragraph contains the following information?</p>
+                                <p>Write the correct letter, <strong>A–H</strong>, in boxes 27–33 on your answer sheet.</p>
+                                <p><em><strong>NB</strong> You may use any letter more than once.</em></p>
+                            </div>
+                            <div class="matching-form-container">
+                                <div class="matching-form-row">
+                                    <label for="q27" class="matching-form-label"><strong>27</strong>&nbsp;&nbsp;the methods some companies use to try to keep their most creative employees</label>
+                                    <select class="answer-input" id="q27"><option value=""></option><option>A</option><option>B</option><option>C</option><option>D</option><option>E</option><option>F</option><option>G</option><option>H</option></select>
+                                </div>
+                                <div class="matching-form-row">
+                                    <label for="q28" class="matching-form-label"><strong>28</strong>&nbsp;&nbsp;a new way of getting help with your personal difficulties</label>
+                                    <select class="answer-input" id="q28"><option value=""></option><option>A</option><option>B</option><option>C</option><option>D</option><option>E</option><option>F</option><option>G</option><option>H</option></select>
+                                </div>
+                                <div class="matching-form-row">
+                                    <label for="q29" class="matching-form-label"><strong>29</strong>&nbsp;&nbsp;how much investment goes into safeguarding the ideas of individuals</label>
+                                    <select class="answer-input" id="q29"><option value=""></option><option>A</option><option>B</option><option>C</option><option>D</option><option>E</option><option>F</option><option>G</option><option>H</option></select>
+                                </div>
+                                <div class="matching-form-row">
+                                    <label for="q30" class="matching-form-label"><strong>30</strong>&nbsp;&nbsp;two examples of companies which have succeeded through being innovative</label>
+                                    <select class="answer-input" id="q30"><option value=""></option><option>A</option><option>B</option><option>C</option><option>D</option><option>E</option><option>F</option><option>G</option><option>H</option></select>
+                                </div>
+                                <div class="matching-form-row">
+                                    <label for="q31" class="matching-form-label"><strong>31</strong>&nbsp;&nbsp;how some innovators manage to avoid spending large sums of money on testing out their ideas</label>
+                                    <select class="answer-input" id="q31"><option value=""></option><option>A</option><option>B</option><option>C</option><option>D</option><option>E</option><option>F</option><option>G</option><option>H</option></select>
+                                </div>
+                                <div class="matching-form-row">
+                                    <label for="q32" class="matching-form-label"><strong>32</strong>&nbsp;&nbsp;a commonly held opinion about product designers that needs to be proved wrong</label>
+                                    <select class="answer-input" id="q32"><option value=""></option><option>A</option><option>B</option><option>C</option><option>D</option><option>E</option><option>F</option><option>G</option><option>H</option></select>
+                                </div>
+                                <div class="matching-form-row">
+                                    <label for="q33" class="matching-form-label"><strong>33</strong>&nbsp;&nbsp;the target of one large company that has changed its business focus</label>
+                                    <select class="answer-input" id="q33"><option value=""></option><option>A</option><option>B</option><option>C</option><option>D</option><option>E</option><option>F</option><option>G</option><option>H</option></select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Q34-37: TRUE/FALSE/NOT GIVEN -->
+                        <div class="question" data-q-start="34" data-q-end="37">
+                            <div class="question-prompt">
+                                <p><strong>Questions 34–37</strong><br>Do the following statements agree with the information given in Reading Passage 3?</p>
+                                <p>In boxes 34–37 on your answer sheet, write:</p>
+                                <ul style="list-style:none;padding-left:0;">
+                                    <li><strong>TRUE</strong> if the statement agrees with the information</li>
+                                    <li><strong>FALSE</strong> if the statement contradicts the information</li>
+                                    <li><strong>NOT GIVEN</strong> if there is no information on this</li>
+                                </ul>
+                            </div>
+                            <div class="tf-question" data-q-start="34" data-q-end="34">
+                                <div class="tf-question-line"><span class="tf-question-number">34</span><span class="tf-question-text">Umagic Systems is an example of a new innovative company.</span></div>
+                                <div class="tf-options"><label class="tf-option"><input type="radio" name="q34" value="TRUE"> TRUE</label><label class="tf-option"><input type="radio" name="q34" value="FALSE"> FALSE</label><label class="tf-option"><input type="radio" name="q34" value="NOT GIVEN"> NOT GIVEN</label></div>
+                            </div>
+                            <div class="tf-question" data-q-start="35" data-q-end="35">
+                                <div class="tf-question-line"><span class="tf-question-number">35</span><span class="tf-question-text">Amazon and Wal-Mart have exchanged successful ideas on innovation.</span></div>
+                                <div class="tf-options"><label class="tf-option"><input type="radio" name="q35" value="TRUE"> TRUE</label><label class="tf-option"><input type="radio" name="q35" value="FALSE"> FALSE</label><label class="tf-option"><input type="radio" name="q35" value="NOT GIVEN"> NOT GIVEN</label></div>
+                            </div>
+                            <div class="tf-question" data-q-start="36" data-q-end="36">
+                                <div class="tf-question-line"><span class="tf-question-number">36</span><span class="tf-question-text">Using financial rewards to encourage innovation is an outdated practice.</span></div>
+                                <div class="tf-options"><label class="tf-option"><input type="radio" name="q36" value="TRUE"> TRUE</label><label class="tf-option"><input type="radio" name="q36" value="FALSE"> FALSE</label><label class="tf-option"><input type="radio" name="q36" value="NOT GIVEN"> NOT GIVEN</label></div>
+                            </div>
+                            <div class="tf-question" data-q-start="37" data-q-end="37">
+                                <div class="tf-question-line"><span class="tf-question-number">37</span><span class="tf-question-text">IBM failed to understand David Post's 'virtual experts' idea.</span></div>
+                                <div class="tf-options"><label class="tf-option"><input type="radio" name="q37" value="TRUE"> TRUE</label><label class="tf-option"><input type="radio" name="q37" value="FALSE"> FALSE</label><label class="tf-option"><input type="radio" name="q37" value="NOT GIVEN"> NOT GIVEN</label></div>
+                            </div>
+                        </div>
+
+                        <!-- Q38-40: Multiple Choice -->
+                        <div class="question" data-q-start="38" data-q-end="40">
+                            <div class="question-prompt">
+                                <p><strong>Questions 38–40</strong><br>Choose the correct letter, <strong>A, B, C</strong> or <strong>D</strong>.</p>
+                            </div>
+                            <div class="multi-choice-question" data-q-start="38" data-q-end="38">
+                                <div class="multi-choice-options">
+                                    <p><strong>38&nbsp;&nbsp;What point does the writer make about intellectual property?</strong></p>
+                                    <div class="multi-choice-option"><label><input type="radio" name="q38" value="A"> A&nbsp;&nbsp;It can be lost when firms merge.</label></div>
+                                    <div class="multi-choice-option"><label><input type="radio" name="q38" value="B"> B&nbsp;&nbsp;It tends to belong to companies rather than individuals.</label></div>
+                                    <div class="multi-choice-option"><label><input type="radio" name="q38" value="C"> C&nbsp;&nbsp;It is valued more than it used to be.</label></div>
+                                    <div class="multi-choice-option"><label><input type="radio" name="q38" value="D"> D&nbsp;&nbsp;It is not usually owned by small companies.</label></div>
+                                </div>
+                            </div>
+                            <div class="multi-choice-question" data-q-start="39" data-q-end="39">
+                                <div class="multi-choice-options">
+                                    <p><strong>39&nbsp;&nbsp;Peter Chemin is an example of someone who has realized that</strong></p>
+                                    <div class="multi-choice-option"><label><input type="radio" name="q39" value="A"> A&nbsp;&nbsp;large companies are less innovative than small ones.</label></div>
+                                    <div class="multi-choice-option"><label><input type="radio" name="q39" value="B"> B&nbsp;&nbsp;other businesses are more innovative than the film business.</label></div>
+                                    <div class="multi-choice-option"><label><input type="radio" name="q39" value="C"> C&nbsp;&nbsp;his employees need more experience of innovation.</label></div>
+                                    <div class="multi-choice-option"><label><input type="radio" name="q39" value="D"> D&nbsp;&nbsp;he is the best person to encourage innovation.</label></div>
+                                </div>
+                            </div>
+                            <div class="multi-choice-question" data-q-start="40" data-q-end="40">
+                                <div class="multi-choice-options">
+                                    <p><strong>40&nbsp;&nbsp;In conclusion, the writer suggests that</strong></p>
+                                    <div class="multi-choice-option"><label><input type="radio" name="q40" value="A"> A&nbsp;&nbsp;computer-based industries cannot be innovative.</label></div>
+                                    <div class="multi-choice-option"><label><input type="radio" name="q40" value="B"> B&nbsp;&nbsp;big firms are right to be cautious about innovation.</label></div>
+                                    <div class="multi-choice-option"><label><input type="radio" name="q40" value="C"> C&nbsp;&nbsp;small firms should not worry about early failures.</label></div>
+                                    <div class="multi-choice-option"><label><input type="radio" name="q40" value="D"> D&nbsp;&nbsp;innovation will always involve some uncertainty.</label></div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div><!-- end questions-panel -->
+        </div><!-- end panels-container -->
+    </div><!-- end main-container -->
+
+    <!-- Navigation Arrows -->
+    <div class="nav-arrows">
+        <button class="nav-arrow" id="prev-btn" onclick="previousQuestion()">&#8592;</button>
+        <button class="nav-arrow" id="next-btn" onclick="nextQuestion()">&#8594;</button>
+    </div>
+
+    <!-- Bottom Nav -->
+    <nav class="nav-row" id="nav-row">
+        <div class="footer__questionWrapper___1tZ46" id="part-btn-1">
+            <button class="footer__questionNo___3WNct" onclick="switchToPart(1)">
+                <span class="section-prefix">Part </span><span class="sectionNr">1</span>
+                <span class="attemptedCount">0 of 13</span>
+            </button>
+            <div class="footer__subquestionWrapper___9GgoP" id="sq-part-1"></div>
+        </div>
+        <div class="nav-separator"></div>
+        <div class="footer__questionWrapper___1tZ46" id="part-btn-2">
+            <button class="footer__questionNo___3WNct" onclick="switchToPart(2)">
+                <span class="section-prefix">Part </span><span class="sectionNr">2</span>
+                <span class="attemptedCount">0 of 13</span>
+            </button>
+            <div class="footer__subquestionWrapper___9GgoP" id="sq-part-2"></div>
+        </div>
+        <div class="nav-separator"></div>
+        <div class="footer__questionWrapper___1tZ46" id="part-btn-3">
+            <button class="footer__questionNo___3WNct" onclick="switchToPart(3)">
+                <span class="section-prefix">Part </span><span class="sectionNr">3</span>
+                <span class="attemptedCount">0 of 14</span>
+            </button>
+            <div class="footer__subquestionWrapper___9GgoP" id="sq-part-3"></div>
+        </div>
+        <div class="deliver-btn-wrapper">
+            <button id="deliver-button">
+                <span>Check Answers</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Context Menu -->
+    <div id="contextMenu" class="context-menu">
+        <div id="menu-highlight" class="context-menu-item" onclick="highlightText()">Highlight</div>
+        <div id="menu-note" class="context-menu-item" onclick="addNote()">Note</div>
+        <div id="menu-clear" class="context-menu-item" onclick="clearHighlight()">Clear</div>
+        <div id="menu-clear-all" class="context-menu-item" onclick="clearAllHighlights()">Clear All</div>
+    </div>
+
+    <!-- Results Modal -->
+    <div id="results-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <button class="modal-close-btn" onclick="closeResultsModal()">&times;</button>
+            <h2>Results</h2>
+            <div class="results-summary">
+                <p>Score: <span id="results-score"></span> / 40</p>
+                <p>IELTS Band: <span id="results-band"></span></p>
+            </div>
+            <div id="results-details" class="results-details-container"></div>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // STATE
+        let currentPassage = 1;
+        let currentQuestion = 1;
+        let selectedRange = null;
+        let timeInSeconds = 3600;
+        let timerInterval;
+
+        // DOM
+        const timerDisplay = document.querySelector('.timer-display');
+        const timerToggleButton = document.getElementById('timer-toggle-btn');
+        const timerResetButton = document.getElementById('timer-reset-btn');
+        const deliverButton = document.getElementById('deliver-button');
+        const resizer = document.getElementById('resizer');
+        const passagePanel = document.getElementById('passage-panel');
+        const questionsPanel = document.getElementById('questions-panel');
+        const contextMenu = document.getElementById('contextMenu');
+
+        const playIcon = '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M8 5v14l11-7L8 5z"/></svg>';
+        const pauseIcon = '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+
+        // ANSWERS — arrays accept variant spellings
+        const correctAnswers = {
+            '1':'FALSE','2':'TRUE','3':'FALSE','4':'TRUE','5':'FALSE','6':'NOT GIVEN',
+            '7':['Roman army','army'],'8':['gardens','formal gardens'],'9':['floors','mosaic floors'],'10':'wall','11':'93','12':['ring','gold ring'],'13':['museum','modern museum'],
+            '14':'vii','15':'iii','16':'vi','17':'i','18':'iv','19':'ii',
+            '20':'C','21':'B','22':'A','23':'B',
+            '24':'threatened','25':'scouts','26':'leaders',
+            '27':'F','28':'A','29':'C','30':'B','31':'E','32':'G','33':'F',
+            '34':'TRUE','35':'NOT GIVEN','36':'FALSE','37':'TRUE',
+            '38':'C','39':'A','40':'D'
+        };
+
+        const partRanges = { 1:[1,13], 2:[14,26], 3:[27,40] };
+
+        function getPartForQuestion(q) {
+            if (q <= 13) return 1;
+            if (q <= 26) return 2;
+            return 3;
+        }
+
+        function buildSubQuestions() {
+            for (let part = 1; part <= 3; part++) {
+                const container = document.getElementById(`sq-part-${part}`);
+                container.innerHTML = '';
+                const [s, e] = partRanges[part];
+                for (let i = s; i <= e; i++) {
+                    const btn = document.createElement('button');
+                    btn.className = 'subQuestion';
+                    btn.textContent = i;
+                    btn.onclick = (ev) => { ev.stopPropagation(); goToQuestion(i); };
+                    btn.id = `sq-btn-${i}`;
+                    container.appendChild(btn);
+                }
+            }
+        }
+
+        function isQuestionAnswered(i) {
+            const textInput = document.querySelector(`input[type="text"]#q${i}`);
+            if (textInput) return textInput.value.trim() !== '';
+            const sel = document.querySelector(`select#q${i}`);
+            if (sel) return sel.value !== '';
+            const radio = document.querySelector(`input[name="q${i}"]:checked`);
+            if (radio) return true;
+            return false;
+        }
+
+        function updateAllIndicators() {
+            for (let part = 1; part <= 3; part++) {
+                const [s, e] = partRanges[part];
+                let count = 0;
+                for (let i = s; i <= e; i++) {
+                    if (isQuestionAnswered(i)) count++;
+                    const btn = document.getElementById(`sq-btn-${i}`);
+                    if (btn) {
+                        btn.classList.toggle('answered', isQuestionAnswered(i));
+                        btn.classList.toggle('active', i === currentQuestion);
+                    }
+                }
+                const wrapper = document.getElementById(`part-btn-${part}`);
+                if (wrapper) {
+                    const span = wrapper.querySelector('.attemptedCount');
+                    if (span) span.textContent = `${count} of ${e - s + 1}`;
+                }
+            }
+        }
+
+        function switchToPart(part) {
+            currentPassage = part;
+            for (let p = 1; p <= 3; p++) {
+                document.getElementById(`passage-text-${p}`).classList.toggle('hidden', p !== part);
+                document.getElementById(`questions-${p}`).classList.toggle('hidden', p !== part);
+                document.getElementById(`part-header-${p}`).classList.toggle('hidden', p !== part);
+                const wrapper = document.getElementById(`part-btn-${p}`);
+                wrapper.classList.toggle('selected', p === part);
+            }
+            goToQuestion(partRanges[part][0]);
+        }
+
+        function goToQuestion(qNum) {
+            currentQuestion = qNum;
+            const part = getPartForQuestion(qNum);
+            if (currentPassage !== part) switchToPart(part);
+
+            const allQEls = questionsPanel.querySelectorAll('[data-q-start]');
+            allQEls.forEach(el => {
+                const s = parseInt(el.dataset.qStart);
+                const e = parseInt(el.dataset.qEnd);
+                if (qNum >= s && qNum <= e) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            });
+
+            document.querySelectorAll('.answer-input.active-input').forEach(el => el.classList.remove('active-input'));
+            const activeInput = document.getElementById(`q${qNum}`);
+            if (activeInput) activeInput.classList.add('active-input');
+
+            updateAllIndicators();
+            updateNavArrows();
+        }
+
+        function nextQuestion() { if (currentQuestion < 40) goToQuestion(currentQuestion + 1); }
+        function previousQuestion() { if (currentQuestion > 1) goToQuestion(currentQuestion - 1); }
+
+        function updateNavArrows() {
+            document.getElementById('prev-btn').disabled = currentQuestion <= 1;
+            document.getElementById('next-btn').disabled = currentQuestion >= 40;
+        }
+
+        // Timer
+        function updateTimerDisplay() {
+            const m = Math.floor(timeInSeconds / 60);
+            const s = timeInSeconds % 60;
+            timerDisplay.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+        }
+
+        function startTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timeInSeconds--;
+                updateTimerDisplay();
+                if (timeInSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    timerDisplay.textContent = "Time's up!";
+                }
+            }, 1000);
+            timerToggleButton.innerHTML = pauseIcon;
+        }
+
+        function pauseTimer() {
+            clearInterval(timerInterval);
+            timerToggleButton.innerHTML = playIcon;
+        }
+
+        function toggleTimer() {
+            if (timerToggleButton.innerHTML.includes('M6 19h4V5H6v14z')) pauseTimer();
+            else startTimer();
+        }
+
+        function resetTimer() {
+            timeInSeconds = 3600;
+            updateTimerDisplay();
+            startTimer();
+        }
+
+        // CHECK ANSWERS
+        function checkAnswers() {
+            const allInputs = document.querySelectorAll('input, select, textarea');
+            allInputs.forEach(inp => inp.disabled = true);
+            deliverButton.disabled = true;
+            deliverButton.style.cursor = 'not-allowed';
+            clearInterval(timerInterval);
+
+            let score = 0;
+            const resultsDetails = document.getElementById('results-details');
+            resultsDetails.innerHTML = '';
+
+            document.querySelectorAll('.correct, .incorrect').forEach(el => {
+                el.classList.remove('correct', 'incorrect');
+            });
+            document.querySelectorAll('.correct-answer-display').forEach(el => el.remove());
+
+            for (let i = 1; i <= 40; i++) {
+                const correct = correctAnswers[String(i)];
+                const correctText = Array.isArray(correct) ? correct.join(' / ') : correct;
+                let userAnswer = '';
+                let isCorrect = false;
+
+                const textEl = document.querySelector(`input[type="text"]#q${i}`);
+                const selEl = document.querySelector(`select#q${i}`);
+                const radioEl = document.querySelector(`input[name="q${i}"]:checked`);
+
+                if (textEl) {
+                    userAnswer = textEl.value.trim();
+                    isCorrect = Array.isArray(correct)
+                        ? correct.some(a => userAnswer.toLowerCase() === a.toLowerCase())
+                        : userAnswer.toLowerCase() === (correct||'').toLowerCase();
+                    textEl.classList.add(isCorrect ? 'correct' : 'incorrect');
+                    if (!isCorrect) {
+                        const sp = document.createElement('span');
+                        sp.className = 'correct-answer-display';
+                        sp.innerHTML = `&nbsp;➜&nbsp;<strong class="correct-answer-highlight">${correctText}</strong>`;
+                        textEl.parentNode.insertBefore(sp, textEl.nextSibling);
+                    }
+                } else if (selEl) {
+                    userAnswer = selEl.value;
+                    const row = selEl.closest('.matching-form-row') || selEl.parentNode;
+                    isCorrect = userAnswer === correct;
+                    row.classList.add(isCorrect ? 'correct' : 'incorrect');
+                    if (!isCorrect) {
+                        const sp = document.createElement('span');
+                        sp.className = 'correct-answer-display';
+                        sp.innerHTML = `&nbsp;➜&nbsp;<strong class="correct-answer-highlight">${correctText}</strong>`;
+                        selEl.parentNode.insertBefore(sp, selEl.nextSibling);
+                    }
+                } else if (radioEl) {
+                    userAnswer = radioEl.value;
+                    isCorrect = userAnswer === correct;
+                    const tfQ = radioEl.closest('.tf-question');
+                    const mcQ = radioEl.closest('.multi-choice-question');
+                    if (tfQ) tfQ.classList.add(isCorrect ? 'correct' : 'incorrect');
+                    if (mcQ) {
+                        mcQ.classList.add(isCorrect ? 'correct' : 'incorrect');
+                        radioEl.closest('.multi-choice-option').classList.add('incorrect');
+                        if (!isCorrect) {
+                            const correctOpt = mcQ.querySelector(`input[value="${correct}"]`);
+                            if (correctOpt) correctOpt.closest('.multi-choice-option').classList.add('correct');
+                        }
+                    }
+                }
+
+                if (isCorrect) score++;
+
+                const btn = document.getElementById(`sq-btn-${i}`);
+                if (btn) {
+                    btn.classList.remove('answered');
+                    btn.classList.add(isCorrect ? 'correct' : 'incorrect');
+                }
+
+                const item = document.createElement('div');
+                item.className = `result-item ${isCorrect ? 'correct' : 'incorrect'}`;
+                item.innerHTML = `<span>Q${i}: ${userAnswer || 'Not Answered'}</span><span>${isCorrect ? '✔' : `✖ → ${correctText}`}</span>`;
+                resultsDetails.appendChild(item);
+            }
+
+            const band = scoreToBand(score);
+            document.getElementById('results-score').textContent = score;
+            document.getElementById('results-band').textContent = band;
+            document.getElementById('results-modal').classList.remove('hidden');
+        }
+
+        function scoreToBand(s) {
+            if (s >= 39) return '9.0';
+            if (s >= 37) return '8.5';
+            if (s >= 35) return '8.0';
+            if (s >= 33) return '7.5';
+            if (s >= 30) return '7.0';
+            if (s >= 27) return '6.5';
+            if (s >= 23) return '6.0';
+            if (s >= 19) return '5.5';
+            if (s >= 15) return '5.0';
+            if (s >= 13) return '4.5';
+            if (s >= 10) return '4.0';
+            return 'Below 4.0';
+        }
+
+        function closeResultsModal() {
+            document.getElementById('results-modal').classList.add('hidden');
+        }
+
+        // HIGHLIGHT & NOTE
+        function initializeContextMenu() {
+            const panels = [passagePanel, questionsPanel];
+
+            document.addEventListener('selectionchange', () => {
+                const sel = window.getSelection();
+                if (sel && !sel.isCollapsed && sel.toString().trim().length > 0) {
+                    const range = sel.getRangeAt(0);
+                    if (panels.some(p => p.contains(range.commonAncestorContainer))) {
+                        selectedRange = range;
+                    }
+                }
+            });
+
+            const showMenu = (e) => {
+                const target = e.target;
+                const onHL = target.closest('.highlight, .comment-highlight');
+                const hasSelection = selectedRange && selectedRange.toString().trim().length > 0;
+                let show = false;
+                if (onHL) {
+                    document.getElementById('menu-highlight').style.display = 'none';
+                    document.getElementById('menu-note').style.display = 'none';
+                    document.getElementById('menu-clear').style.display = 'block';
+                    document.getElementById('menu-clear-all').style.display = 'block';
+                    contextMenu.targetElementForClear = onHL;
+                    show = true;
+                } else if (hasSelection && panels.some(p => p.contains(selectedRange.commonAncestorContainer))) {
+                    document.getElementById('menu-highlight').style.display = 'flex';
+                    document.getElementById('menu-note').style.display = 'flex';
+                    document.getElementById('menu-clear').style.display = 'none';
+                    document.getElementById('menu-clear-all').style.display = 'block';
+                    show = true;
+                }
+                if (show) {
+                    e.preventDefault();
+                    contextMenu.style.display = 'block';
+                    const mh = contextMenu.offsetHeight, mw = contextMenu.offsetWidth;
+                    let left = e.pageX, top = e.pageY - mh - 5;
+                    if (left + mw > window.innerWidth) left = window.innerWidth - mw - 5;
+                    if (top < 0) top = e.pageY + 5;
+                    contextMenu.style.left = `${left}px`;
+                    contextMenu.style.top = `${top}px`;
+                }
+            };
+
+            panels.forEach(p => p.addEventListener('contextmenu', showMenu));
+            document.addEventListener('click', (e) => {
+                if (contextMenu.style.display === 'block' && !contextMenu.contains(e.target)) closeContextMenu();
+            });
+        }
+
+        function closeContextMenu() {
+            contextMenu.style.display = 'none';
+            selectedRange = null;
+        }
+
+        function unwrapElement(el) {
+            const parent = el.parentNode;
+            if (!parent) return;
+            while (el.firstChild) parent.insertBefore(el.firstChild, el);
+            parent.removeChild(el);
+            parent.normalize();
+        }
+
+        window.highlightText = () => {
+            if (selectedRange && !selectedRange.collapsed) {
+                const selectedContent = selectedRange.extractContents();
+                const span = document.createElement('span');
+                span.className = 'highlight';
+                span.appendChild(selectedContent);
+                selectedRange.insertNode(span);
+            }
+            closeContextMenu();
+            window.getSelection().removeAllRanges();
+        };
+
+        window.addNote = () => {
+            const note = prompt('Enter your note:');
+            if (!note || !selectedRange || selectedRange.collapsed) {
+                closeContextMenu();
+                window.getSelection().removeAllRanges();
+                return;
+            }
+            const span = document.createElement('span');
+            span.className = 'comment-highlight';
+            const tooltip = document.createElement('span');
+            tooltip.className = 'comment-tooltip';
+            tooltip.textContent = note;
+            span.appendChild(selectedRange.extractContents());
+            span.appendChild(tooltip);
+            selectedRange.insertNode(span);
+            closeContextMenu();
+            window.getSelection().removeAllRanges();
+        };
+
+        window.clearHighlight = () => {
+            const el = contextMenu.targetElementForClear;
+            if (el) unwrapElement(el);
+            closeContextMenu();
+            window.getSelection().removeAllRanges();
+        };
+
+        window.clearAllHighlights = () => {
+            document.querySelectorAll('.highlight, .comment-highlight').forEach(unwrapElement);
+            closeContextMenu();
+            window.getSelection().removeAllRanges();
+        };
+
+        // RESIZER
+        function initResize(e) {
+            e.preventDefault();
+            const startX = e.clientX;
+            const startWidth = passagePanel.offsetWidth;
+            const doDrag = (e) => {
+                const nw = startWidth + e.clientX - startX;
+                if (nw > 200 && (document.body.clientWidth - nw - resizer.offsetWidth) > 200) {
+                    passagePanel.style.flex = `0 0 ${nw}px`;
+                }
+            };
+            const stopDrag = () => {
+                window.removeEventListener('mousemove', doDrag);
+                window.removeEventListener('mouseup', stopDrag);
+            };
+            window.addEventListener('mousemove', doDrag);
+            window.addEventListener('mouseup', stopDrag);
+        }
+
+        // GOTO WIDGET
+        document.getElementById('goto-btn').addEventListener('click', () => {
+            const val = parseInt(document.getElementById('goto-input').value);
+            if (val >= 1 && val <= 40) goToQuestion(val);
+        });
+        document.getElementById('goto-input').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') document.getElementById('goto-btn').click();
+        });
+
+        // EXPOSE GLOBALS
+        window.nextQuestion = nextQuestion;
+        window.previousQuestion = previousQuestion;
+        window.goToQuestion = goToQuestion;
+        window.switchToPart = switchToPart;
+        window.closeResultsModal = closeResultsModal;
+
+        // INIT
+        function initialize() {
+            buildSubQuestions();
+            startTimer();
+            switchToPart(1);
+            resizer.addEventListener('mousedown', initResize);
+            initializeContextMenu();
+            document.body.addEventListener('input', updateAllIndicators);
+            document.body.addEventListener('change', updateAllIndicators);
+            deliverButton.addEventListener('click', checkAnswers);
+            timerToggleButton.addEventListener('click', toggleTimer);
+            timerResetButton.addEventListener('click', resetTimer);
+            document.querySelectorAll('[data-q-start]').forEach(el => {
+                el.addEventListener('click', () => {
+                    const q = parseInt(el.dataset.qStart);
+                    if (currentQuestion !== q) goToQuestion(q);
+                });
+            });
+        }
+
+        /* ====================================================================
+           Student-info gate + Google Form submission
+           ==================================================================== */
+        const GOOGLE_FORM = {
+            formId: "1FAIpQLSeCkX-TZqgj0V8mmxdcNST9X_HikIoAjV1S5RVbP47aQGpjmA",
+            fields: {
+                name:    "entry.1094675708",
+                class:   "entry.2049893611",
+                answers: "entry.2080304740",
+                score:   "entry.1082748256",
+            },
+        };
+
+        const student = { name: "", class: "" };
+
+        const gateOverlay = document.getElementById("gate-overlay");
+        const gateName    = document.getElementById("gate-name");
+        const gateClass   = document.getElementById("gate-class");
+        const gateError   = document.getElementById("gate-error");
+        const gateStart   = document.getElementById("gate-start");
+
+        function startPractice() {
+            const nameVal  = gateName.value.trim();
+            const classVal = gateClass.value.trim();
+            gateName.classList.toggle("invalid", !nameVal);
+            gateClass.classList.toggle("invalid", !classVal);
+            if (!nameVal || !classVal) {
+                gateError.textContent = "Please enter both your name and your class.";
+                (nameVal ? gateClass : gateName).focus();
+                return;
+            }
+            student.name  = nameVal;
+            student.class = classVal;
+            gateError.textContent = "";
+            gateOverlay.style.display = "none";
+
+            // Show identity badge in the header
+            const testInfo = document.querySelector(".test-info");
+            if (testInfo) {
+                const tag = document.createElement("span");
+                tag.className = "student-tag";
+                tag.innerHTML = "Student · <b></b> · Class · <b></b>";
+                tag.querySelectorAll("b")[0].textContent = student.name;
+                tag.querySelectorAll("b")[1].textContent = student.class;
+                testInfo.appendChild(tag);
+            }
+
+            // Now the page is actually starting — initialize and start the 60-minute timer.
+            initialize();
+        }
+
+        gateStart.addEventListener("click", startPractice);
+        [gateName, gateClass].forEach(el => {
+            el.addEventListener("keydown", e => {
+                if (e.key === "Enter") { e.preventDefault(); startPractice(); }
+            });
+            el.addEventListener("input", () => {
+                el.classList.remove("invalid");
+                gateError.textContent = "";
+            });
+        });
+        setTimeout(() => gateName.focus(), 50);
+
+        // Build a transcript: each question's number, the student's input, and ✓/✕.
+        // Correct answers are NOT included in the form submission, even though this
+        // exam page itself reveals them on-screen after grading — keeping the
+        // teacher's Responses log focused on what each student actually wrote.
+        function collectAnswersTranscript() {
+            const lines = [];
+            for (let i = 1; i <= 40; i++) {
+                const correct = correctAnswers[String(i)];
+                const selectEl = document.querySelector(`select#q${i}`);
+                const textEl   = document.querySelector(`input[type="text"]#q${i}`);
+                const radioEl  = document.querySelector(`input[name="q${i}"]:checked`);
+                let userAnswer = "";
+                let isCorrect = false;
+                if (textEl) {
+                    userAnswer = textEl.value.trim();
+                    isCorrect  = Array.isArray(correct)
+                        ? correct.some(a => userAnswer.toLowerCase() === a.toLowerCase())
+                        : userAnswer.toLowerCase() === (correct || "").toLowerCase();
+                } else if (selectEl) {
+                    userAnswer = selectEl.value;
+                    isCorrect  = userAnswer !== "" && userAnswer === correct;
+                } else if (radioEl) {
+                    userAnswer = radioEl.value;
+                    isCorrect  = userAnswer === correct;
+                }
+                const status = !userAnswer ? "·" : (isCorrect ? "✓" : "✕");
+                lines.push(`Q${String(i).padStart(2, "0")}. [${status}] ${userAnswer || "(not answered)"}`);
+            }
+            return lines.join("\n");
+        }
+
+        let hasSubmitted = false;
+        function submitToGoogleForm() {
+            if (hasSubmitted) return;
+            hasSubmitted = true;
+
+            const right = parseInt(document.getElementById("results-score").textContent, 10) || 0;
+            const url = `https://docs.google.com/forms/d/e/${GOOGLE_FORM.formId}/formResponse`;
+            const payload = {
+                [GOOGLE_FORM.fields.name]:    student.name,
+                [GOOGLE_FORM.fields.class]:   student.class,
+                [GOOGLE_FORM.fields.answers]: collectAnswersTranscript(),
+                [GOOGLE_FORM.fields.score]:   `${right} / 40`,
+            };
+
+            // Hidden-iframe form POST: the most reliable way to write to Google Forms
+            // from a webpage. The response loads into the invisible iframe, bypassing CORS.
+            let iframe = document.getElementById("gf-sink");
+            if (!iframe) {
+                iframe = document.createElement("iframe");
+                iframe.name = "gf-sink"; iframe.id = "gf-sink";
+                iframe.style.display = "none";
+                document.body.appendChild(iframe);
+            }
+            const form = document.createElement("form");
+            form.action = url; form.method = "POST"; form.target = "gf-sink";
+            form.style.display = "none";
+            Object.entries(payload).forEach(([k, v]) => {
+                const inp = document.createElement("input");
+                inp.type = "hidden"; inp.name = k; inp.value = v;
+                form.appendChild(inp);
+            });
+            document.body.appendChild(form);
+
+            let settled = false;
+            const onLoad = () => {
+                if (settled) return;
+                settled = true;
+                iframe.removeEventListener("load", onLoad);
+                setTimeout(() => form.remove(), 100);
+            };
+            iframe.addEventListener("load", onLoad);
+            form.submit();
+            setTimeout(() => {
+                if (settled) return;
+                settled = true;
+                iframe.removeEventListener("load", onLoad);
+                hasSubmitted = false; // allow retry
+                try { form.remove(); } catch (_) {}
+            }, 8000);
+        }
+
+        // Hook into the existing flow by observing #results-modal becoming visible.
+        // checkAnswers() removes the "hidden" class from #results-modal, and
+        // closeResultsModal() re-adds it. After the modal opens we wait one frame
+        // for #results-score to be populated, then send.
+        const resultsModal = document.getElementById("results-modal");
+        const resultsObserver = new MutationObserver(() => {
+            if (!resultsModal.classList.contains("hidden") && !hasSubmitted) {
+                requestAnimationFrame(() => submitToGoogleForm());
+            }
+        });
+        resultsObserver.observe(resultsModal, { attributes: true, attributeFilter: ["class"] });
+
+        // Note: initialize() is now called by startPractice() once the gate closes,
+        // not here — so the 60-minute timer doesn't start while the student is
+        // entering their name and class.
+    });
+    </script>
+</body>
+</html>
